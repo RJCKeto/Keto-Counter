@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keto Day Count</title>
+<style>
+  :root {
+    --bg: #1A1612;
+    --bg-soft: #221C17;
+    --amber: #E8A33D;
+    --amber-dim: #B97E2C;
+    --rust: #8B4226;
+    --bone: #F2EDE4;
+    --bone-dim: #A89E8F;
+    --sage: #7C8870;
+    --display: 'DM Mono', 'Courier New', monospace;
+    --body: 'DM Mono', 'Courier New', monospace;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--bone);
+    font-family: var(--body);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ember glow signature element */
+  .ember {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(232,163,61,0.16) 0%, rgba(139,66,38,0.08) 40%, transparent 70%);
+    filter: blur(20px);
+    animation: flicker 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
+    25% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
+    50% { opacity: 0.7; transform: translate(-50%, -50%) scale(0.97); }
+    75% { opacity: 0.95; transform: translate(-50%, -50%) scale(1.02); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ember { animation: none; }
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 420px;
+    width: 100%;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--amber-dim);
+    margin-bottom: 28px;
+  }
+
+  .count {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: clamp(96px, 28vw, 180px);
+    line-height: 0.9;
+    color: var(--amber);
+    letter-spacing: -0.02em;
+    text-shadow: 0 0 60px rgba(232,163,61,0.25);
+  }
+
+  .unit {
+    font-size: 18px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bone-dim);
+    margin-top: 8px;
+    margin-bottom: 36px;
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--sage);
+    letter-spacing: 0.04em;
+    margin-bottom: 44px;
+  }
+
+  .status .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--sage);
+    box-shadow: 0 0 8px var(--sage);
+  }
+
+  .divider {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--rust), transparent);
+    margin: 0 auto 36px;
+  }
+
+  .since {
+    font-size: 12px;
+    color: var(--bone-dim);
+    letter-spacing: 0.04em;
+  }
+
+  .since span {
+    color: var(--amber-dim);
+  }
+
+  @media (max-width: 380px) {
+    .ember { width: 400px; height: 400px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ember"></div>
+
+<div class="wrap">
+  <div class="eyebrow">Keto Tracker</div>
+
+  <div id="display"></div>
+
+  <div class="divider"></div>
+
+  <div class="since">started <span>March 24, 2026</span></div>
+</div>
+
+<script>
+  const START_DATE = '2026-03-24';
+  const display = document.getElementById('display');
+
+  function daysSince(dateStr) {
+    const start = new Date(dateStr + 'T00:00:00');
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const diff = Math.floor((today - start) / 86400000) + 1;
+    return diff;
+  }
+
+  function render(dateStr) {
+    const days = daysSince(dateStr);
+
+    if (days < 1) {
+      display.innerHTML = `<div class="empty-state">Counting starts<br>March 24, 2026.</div>`;
+      return;
+    }
+
+    const label = days === 1 ? 'day in' : 'days in';
+    display.innerHTML = `
+      <div class="count">${days}</div>
+      <div class="unit">${label}</div>
+      <div class="status"><span class="dot"></span>fat-adapted clock running</div>
+    `;
+  }
+
+  function setFavicon(days) {
+    const size = 64;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+
+    // background — rounded square, charcoal to match the page
+    const radius = 14;
+    ctx.fillStyle = '#1A1612';
+    ctx.beginPath();
+    ctx.moveTo(radius, 0);
+    ctx.arcTo(size, 0, size, size, radius);
+    ctx.arcTo(size, size, 0, size, radius);
+    ctx.arcTo(0, size, 0, 0, radius);
+    ctx.arcTo(0, 0, size, 0, radius);
+    ctx.closePath();
+    ctx.fill();
+
+    // thin amber border
+    ctx.strokeStyle = '#8B4226';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // the number itself
+    const text = String(days);
+    ctx.fillStyle = '#E8A33D';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // shrink font as digit count grows so it always fits
+    let fontSize = text.length <= 2 ? 38 : text.length === 3 ? 30 : 24;
+    ctx.font = `700 ${fontSize}px Georgia, serif`;
+    ctx.fillText(text, size / 2, size / 2 + 2);
+
+    const link = document.querySelector("link[rel~='icon']") || document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/png';
+    link.href = canvas.toDataURL('image/png');
+    document.head.appendChild(link);
+  }
+
+  render(START_DATE);
+  setFavicon(daysSince(START_DATE));
+</script>
+
+</body>
+</html>
