@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keto Day Count</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Keto">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --burgundy-top: #6E1A18;
+    --burgundy-bottom: #4A0F0F;
+    --green: #1F4A2C;
+    --green-light: #2A5C38;
+    --gold: #D8B65A;
+    --gold-light: #E8CC7E;
+    --maroon-text: #5C1414;
+    --maroon-text-soft: #7A2E1E;
+    --cream: #EFD89A;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  html { background: var(--burgundy-bottom); }
+
+  body {
+    background: linear-gradient(180deg, var(--burgundy-top) 0%, var(--burgundy-bottom) 600px, var(--burgundy-bottom) 100%);
+    font-family: 'Fraunces', serif;
+    color: var(--cream);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 20px 40px;
+  }
+
+  .page { width: 100%; max-width: 460px; }
+
+  .badge-row { display: flex; justify-content: center; margin-bottom: 16px; }
+
+  .badge {
+    background: var(--gold);
+    color: var(--maroon-text);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 12px 26px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 19px;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--gold-light);
+    margin-bottom: 22px;
+  }
+
+  .medal-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: clamp(12px, 3vh, 28px);
+  }
+
+  .medal {
+    width: clamp(160px, 34vmin, 280px);
+    height: clamp(160px, 34vmin, 280px);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--green-light), var(--green) 70%);
+    border: 7px solid var(--gold);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.15), 0 12px 32px rgba(0,0,0,0.35), inset 0 2px 12px rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .medal-count {
+    font-size: clamp(48px, 11vmin, 90px);
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .medal-label {
+    font-size: clamp(16px, 3.6vmin, 26px);
+    font-style: italic;
+    font-weight: 500;
+    color: var(--gold);
+    margin-top: 4px;
+  }
+
+  .card {
+    background: var(--gold);
+    border-radius: 18px;
+    padding: 18px 24px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  }
+
+  .stats-card {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .stat { flex: 1; padding: 0 18px; }
+
+  .stat-num {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--maroon-text);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--maroon-text-soft);
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  .stat-divider { width: 1px; background: rgba(92,20,20,0.25); }
+
+  .card-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--maroon-text);
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+
+  .weight-row { display: flex; justify-content: space-between; text-align: center; }
+  .weight-item { flex: 1; }
+
+  .weight-num { font-size: 30px; font-weight: 700; color: var(--maroon-text); }
+  .weight-num small { font-size: 17px; font-weight: 600; }
+
+  .weight-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--maroon-text-soft);
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .weight-divider { width: 1px; background: rgba(92,20,20,0.2); margin: 4px 6px; }
+
+  .milestone-row { display: flex; align-items: baseline; justify-content: space-between; }
+  .milestone-target { font-size: 30px; font-weight: 700; color: var(--maroon-text); }
+  .milestone-right { text-align: right; }
+  .milestone-num { font-size: 30px; font-weight: 700; color: var(--maroon-text); line-height: 1; }
+
+  .milestone-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--maroon-text-soft);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  @media (max-width: 380px) { .stat-num { font-size: 32px; } }
+
+  @media (max-height: 700px) {
+    body { padding-top: 16px; padding-bottom: 24px; }
+    .badge-row { margin-bottom: 10px; }
+    .subtitle { margin-bottom: 14px; font-size: 16px; }
+    .card { padding: 14px 22px; margin-bottom: 10px; }
+    .card-title { margin-bottom: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="badge-row"><div class="badge">Rob's Keto</div></div>
+  <div class="subtitle" id="subtitleText">Started on March 24th, 2026</div>
+
+  <div class="medal-wrap">
+    <div class="medal">
+      <div class="medal-count" id="medalCount">0</div>
+      <div class="medal-label">Days</div>
+    </div>
+  </div>
+
+  <div class="card stats-card">
+    <div class="stat">
+      <div class="stat-num" id="weeksNum">0</div>
+      <div class="stat-label">Weeks</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-num" id="remDaysNum">0</div>
+      <div class="stat-label">Days</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Current Weight</div>
+    <div class="weight-row">
+      <div class="weight-item">
+        <div class="weight-num" id="weightStones"></div>
+        <div class="weight-label">Stones</div>
+      </div>
+      <div class="weight-divider"></div>
+      <div class="weight-item">
+        <div class="weight-num" id="weightLb"></div>
+        <div class="weight-label">Pounds</div>
+      </div>
+      <div class="weight-divider"></div>
+      <div class="weight-item">
+        <div class="weight-num" id="weightKg"></div>
+        <div class="weight-label">Kilograms</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Next Milestone</div>
+    <div class="milestone-row">
+      <div class="milestone-target" id="milestoneTargetText"></div>
+      <div class="milestone-right">
+        <div class="milestone-num" id="milestoneDaysLeft"></div>
+        <div class="milestone-sub" id="milestoneSubText"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const START_DATE = '2026-03-24';
+  const WEIGHT_LB = 210;       // update this number when your weight changes
+  const MILESTONE_DAYS = 100;  // update this number to change your next milestone
+
+  function daysSince(dateStr) {
+    const start = new Date(dateStr + 'T00:00:00');
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    return Math.floor((today - start) / 86400000) + 1;
+  }
+
+  function ordinal(n) {
+    const s = ['th','st','nd','rd'], v = n % 100;
+    return n + (s[(v-20)%10] || s[v] || s[0]);
+  }
+
+  // Day count
+  const days = Math.max(daysSince(START_DATE), 0);
+  document.getElementById('medalCount').textContent = days;
+  document.getElementById('weeksNum').textContent = Math.floor(days / 7);
+  document.getElementById('remDaysNum').textContent = days % 7;
+
+  // Subtitle
+  const d = new Date(START_DATE + 'T00:00:00');
+  document.getElementById('subtitleText').textContent =
+    `Started on ${d.toLocaleString('en-US',{month:'long'})} ${ordinal(d.getDate())}, ${d.getFullYear()}`;
+
+  // Weight
+  const stones = Math.floor(WEIGHT_LB / 14);
+  const remLb = Math.round(WEIGHT_LB - stones * 14);
+  const kg = (WEIGHT_LB * 0.453592).toFixed(1);
+  document.getElementById('weightStones').innerHTML = `${stones}<small>st</small> ${remLb}<small>lb</small>`;
+  document.getElementById('weightLb').innerHTML = `${WEIGHT_LB}<small>lb</small>`;
+  document.getElementById('weightKg').innerHTML = `${kg}<small>kg</small>`;
+
+  // Milestone
+  const diff = MILESTONE_DAYS - days;
+  document.getElementById('milestoneTargetText').textContent = `${MILESTONE_DAYS} Days`;
+  document.getElementById('milestoneDaysLeft').textContent = diff > 0 ? diff : diff === 0 ? '🎉' : Math.abs(diff);
+  document.getElementById('milestoneSubText').textContent = diff > 0 ? 'days to go' : diff === 0 ? 'today!' : 'days past';
+
+  // Favicons
+  function setFavicons(n) {
+    const text = String(n);
+    const draw = (size, r, fs, stroke, bw) => {
+      const c = document.createElement('canvas');
+      c.width = c.height = size;
+      const ctx = c.getContext('2d');
+      if (r) {
+        ctx.fillStyle = '#1F4A2C';
+        ctx.beginPath();
+        ctx.moveTo(r,0); ctx.arcTo(size,0,size,size,r); ctx.arcTo(size,size,0,size,r);
+        ctx.arcTo(0,size,0,0,r); ctx.arcTo(0,0,size,0,r); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle='#D8B65A'; ctx.lineWidth=bw; ctx.stroke();
+      } else {
+        ctx.fillStyle='#1F4A2C'; ctx.fillRect(0,0,size,size);
+        ctx.strokeStyle='#D8B65A'; ctx.lineWidth=stroke; ctx.strokeRect(stroke/2,stroke/2,size-stroke,size-stroke);
+      }
+      ctx.fillStyle='#D8B65A'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.font=`700 ${fs}px Georgia,serif`;
+      ctx.fillText(text, size/2, size/2+size*0.04);
+      return c.toDataURL('image/png');
+    };
+    const fs = text.length<=2?36:text.length===3?28:22;
+    let link = document.querySelector("link[rel~='icon']") || document.createElement('link');
+    link.rel='icon'; link.type='image/png'; link.href=draw(64,14,fs,3,3);
+    document.head.appendChild(link);
+    const tfs = text.length<=2?100:text.length===3?78:62;
+    let tl = document.querySelector("link[rel='apple-touch-icon']") || document.createElement('link');
+    tl.rel='apple-touch-icon'; tl.href=draw(180,0,tfs,6,6);
+    document.head.appendChild(tl);
+  }
+
+  setFavicons(days);
+</script>
+
+</body>
+</html>
