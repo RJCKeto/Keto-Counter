@@ -1,22 +1,18 @@
-# 1. Backend: Tells the CMS to save data directly to your GitHub repo via Netlify
 backend:
   name: git-gateway
-  branch: main # Change to 'master' if your default branch is master
+  branch: main
 
-# 2. Media: Tells the CMS where to save images uploaded by the editor
-media_folder: "images/uploads" # Uploaded images will go here
-public_folder: "/images/uploads" # This is how the HTML layout will reference them
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
 
-# 3. Collections: Defines what kind of content you want to edit
 collections:
-  - name: "blog" # Used internally by the CMS
-    label: "Blog Posts" # What you see in the sidebar dashboard
-    folder: "_posts" # The folder in GitHub where your markdown (.md) articles will save
-    create: true # Allows you to create new posts from the dashboard
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}" # Standard Jekyll naming format
-    fields: # The form fields the journalist fills out
-      - { label: "Layout", name: "layout", widget: "hidden", default: "post" }
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Publish Date", name: "date", widget: "datetime" }
-      - { label: "Featured Image", name: "image", widget: "image", required: false }
-      - { label: "Body", name: "body", widget: "markdown" }
+  - name: "pages"
+    label: "Pages"
+    files:
+      - file: "index.html" # Targets your main page directly
+        label: "Home Page Tracker"
+        name: "home"
+        fields:
+          - { label: "Current Weight (kg/lbs)", name: "current_weight", widget: "string" }
+          - { label: "Next Milestone Goal", name: "next_milestone", widget: "string" }
+          - { label: "Main Page Content Text", name: "body", widget: "markdown" }
